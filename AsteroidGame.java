@@ -42,7 +42,7 @@ import java.applet.AudioClip;
 ******************************************************************************/
 
 
-public class Asteroids extends Applet implements Runnable, KeyListener {
+public class AsteroidGame extends Applet implements Runnable, KeyListener {
 
   // Copyright information.
 
@@ -947,5 +947,4 @@ public class Asteroids extends Applet implements Runnable, KeyListener {
 
     g.drawImage(offImage, 0, 0, this);
   }
-}
-Status 
+} 
