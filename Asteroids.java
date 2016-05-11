@@ -146,15 +146,15 @@ public class Asteroids extends Applet implements Runnable, KeyListener {
   boolean up    = false;
   boolean down  = false;
 
-  // Sprite objects.
+  // sObj objects.
 
-  Ship   ship;
+  SpaceObject   ship;
   Thruster   fwdThruster, revThruster;
-  UFO   ufo;
-  Missle   missle;
-  AsteroidsSprite[] photons    = new AsteroidsSprite[MAX_SHOTS];
-  AsteroidsSprite[] asteroids  = new AsteroidsSprite[MAX_ROCKS];
-  AsteroidsSprite[] explosions = new AsteroidsSprite[MAX_SCRAP];
+  SpaceObject   ufo;
+  SpaceObject   missle;
+  SpaceObject[] photons    = new SpaceObject[MAX_SHOTS];
+  SpaceObject[] asteroids  = new SpaceObject[MAX_ROCKS];
+  SpaceObject[] explosions = new SpaceObject[MAX_SCRAP];
 
   // Ship data.
 
@@ -164,7 +164,7 @@ public class Asteroids extends Applet implements Runnable, KeyListener {
 
   // Photon data.
 
-  int   photonIndex;    // Index to next available photon sprite.
+  int   photonIndex;    // Index to next available photon sObj.
   long  photonTime;     // Time value used to keep firing rate constant.
 
   // Flying saucer data.
@@ -186,7 +186,7 @@ public class Asteroids extends Applet implements Runnable, KeyListener {
   // Explosion data.
 
   int[] explosionCounter = new int[MAX_SCRAP];  // Time counters for explosions.
-  int   explosionIndex;                         // Next available explosion sprite.
+  int   explosionIndex;                         // Next available explosion sObj.
 
   // Sound clips.
 
@@ -245,44 +245,32 @@ public class Asteroids extends Applet implements Runnable, KeyListener {
 
     // Save the screen size.
 
-    AsteroidsSprite.width = d.width;
-    AsteroidsSprite.height = d.height;
+    SpaceObject.width = d.width;
+    SpaceObject.height = d.height;
 
     // Generate the starry background.
 
-    numStars = AsteroidsSprite.width * AsteroidsSprite.height / 5000;
+    numStars = SpaceObject.width * SpaceObject.height / 5000;
     stars = new Point[numStars];
     for (i = 0; i < numStars; i++)
-      stars[i] = new Point((int) (Math.random() * AsteroidsSprite.width), (int) (Math.random() * AsteroidsSprite.height));
+      stars[i] = new Point((int) (Math.random() * SpaceObject.width), (int) (Math.random() * SpaceObject.height));
 
-    // Create shape for the ship sprite.
+    // Create shape for the ship sObj.
 
-    ship = new AsteroidsSprite();
+    ship = new SpaceObject();
     ship.shape.addPoint(0, -10);
     ship.shape.addPoint(7, 10);
     ship.shape.addPoint(-7, 10);
 
     // Create shapes for the ship thrusters.
 
-    fwdThruster = new AsteroidsSprite();
-    fwdThruster.shape.addPoint(0, 12);
-    fwdThruster.shape.addPoint(-3, 16);
-    fwdThruster.shape.addPoint(0, 26);
-    fwdThruster.shape.addPoint(3, 16);
-    revThruster = new AsteroidsSprite();
-    revThruster.shape.addPoint(-2, 12);
-    revThruster.shape.addPoint(-4, 14);
-    revThruster.shape.addPoint(-2, 20);
-    revThruster.shape.addPoint(0, 14);
-    revThruster.shape.addPoint(2, 12);
-    revThruster.shape.addPoint(4, 14);
-    revThruster.shape.addPoint(2, 20);
-    revThruster.shape.addPoint(0, 14);
+    fwdThruster = Thruster.fwdThruster;
+    revThruster = Thruster.revThruster;
 
     // Create shape for each photon sprites.
 
     for (i = 0; i < MAX_SHOTS; i++) {
-      photons[i] = new AsteroidsSprite();
+      photons[i] = new SpaceObject();
       photons[i].shape.addPoint(1, 1);
       photons[i].shape.addPoint(1, -1);
       photons[i].shape.addPoint(-1, 1);
@@ -291,7 +279,7 @@ public class Asteroids extends Applet implements Runnable, KeyListener {
 
     // Create shape for the flying saucer.
 
-    ufo = new AsteroidsSprite();
+    ufo = new SpaceObject();
     ufo.shape.addPoint(-15, 0);
     ufo.shape.addPoint(-10, -5);
     ufo.shape.addPoint(-5, -5);
@@ -305,7 +293,7 @@ public class Asteroids extends Applet implements Runnable, KeyListener {
 
     // Create shape for the guided missle.
 
-    missle = new AsteroidsSprite();
+    missle = new SpaceObject();
     missle.shape.addPoint(0, -4);
     missle.shape.addPoint(1, -3);
     missle.shape.addPoint(1, 3);
@@ -317,12 +305,12 @@ public class Asteroids extends Applet implements Runnable, KeyListener {
     // Create asteroid sprites.
 
     for (i = 0; i < MAX_ROCKS; i++)
-      asteroids[i] = new AsteroidsSprite();
+      asteroids[i] = new SpaceObject();
 
     // Create explosion sprites.
 
     for (i = 0; i < MAX_SCRAP; i++)
-      explosions[i] = new AsteroidsSprite();
+      explosions[i] = new SpaceObject();
 
     // Initialize game data and put us in 'game over' mode.
 
@@ -449,7 +437,7 @@ public class Asteroids extends Applet implements Runnable, KeyListener {
 
   public void initShip() {
 
-    // Reset the ship sprite at the center of the screen.
+    // Reset the ship sObj at the center of the screen.
 
     ship.active = true;
     ship.angle = 0.0;
@@ -536,7 +524,7 @@ public class Asteroids extends Applet implements Runnable, KeyListener {
       if (hyperCounter > 0)
         hyperCounter--;
 
-      // Update the thruster sprites to match the ship sprite.
+      // Update the thruster sprites to match the ship sObj.
 
       fwdThruster.x = ship.x;
       fwdThruster.y = ship.y;
@@ -605,14 +593,14 @@ public class Asteroids extends Applet implements Runnable, KeyListener {
     // Randomly set flying saucer at left or right edge of the screen.
 
     ufo.active = true;
-    ufo.x = -AsteroidsSprite.width / 2;
-    ufo.y = Math.random() * 2 * AsteroidsSprite.height - AsteroidsSprite.height;
+    ufo.x = -SpaceObject.width / 2;
+    ufo.y = Math.random() * 2 * SpaceObject.height - SpaceObject.height;
     angle = Math.random() * Math.PI / 4 - Math.PI / 2;
     speed = MAX_ROCK_SPEED / 2 + Math.random() * (MAX_ROCK_SPEED / 2);
     ufo.deltaX = speed * -Math.sin(angle);
     ufo.deltaY = speed *  Math.cos(angle);
     if (Math.random() < 0.5) {
-      ufo.x = AsteroidsSprite.width / 2;
+      ufo.x = SpaceObject.width / 2;
       ufo.deltaX = -ufo.deltaX;
     }
     if (ufo.y > 0)
@@ -621,7 +609,7 @@ public class Asteroids extends Applet implements Runnable, KeyListener {
     saucerPlaying = true;
     if (sound)
       saucerSound.loop();
-    ufoCounter = (int) Math.abs(AsteroidsSprite.width / ufo.deltaX);
+    ufoCounter = (int) Math.abs(SpaceObject.width / ufo.deltaX);
   }
 
   public void updateUfo() {
@@ -800,16 +788,16 @@ public class Asteroids extends Applet implements Runnable, KeyListener {
       // Place the asteroid at one edge of the screen.
 
       if (Math.random() < 0.5) {
-        asteroids[i].x = -AsteroidsSprite.width / 2;
+        asteroids[i].x = -SpaceObject.width / 2;
         if (Math.random() < 0.5)
-          asteroids[i].x = AsteroidsSprite.width / 2;
-        asteroids[i].y = Math.random() * AsteroidsSprite.height;
+          asteroids[i].x = SpaceObject.width / 2;
+        asteroids[i].y = Math.random() * SpaceObject.height;
       }
       else {
-        asteroids[i].x = Math.random() * AsteroidsSprite.width;
-        asteroids[i].y = -AsteroidsSprite.height / 2;
+        asteroids[i].x = Math.random() * SpaceObject.width;
+        asteroids[i].y = -SpaceObject.height / 2;
         if (Math.random() < 0.5)
-          asteroids[i].y = AsteroidsSprite.height / 2;
+          asteroids[i].y = SpaceObject.height / 2;
       }
 
       // Set a random motion for the asteroid.
@@ -932,28 +920,28 @@ public class Asteroids extends Applet implements Runnable, KeyListener {
     explosionIndex = 0;
   }
 
-  public void explode(AsteroidsSprite s) {
+  public void explode(SpaceObject s) {
 
     int c, i, j;
     int cx, cy;
 
     // Create sprites for explosion animation. The each individual line segment
-    // of the given sprite is used to create a new sprite that will move
-    // outward  from the sprite's original position with a random rotation.
+    // of the given sObj is used to create a new sObj that will move
+    // outward  from the sObj's original position with a random rotation.
 
     s.render();
     c = 2;
-    if (detail || s.sprite.npoints < 6)
+    if (detail || s.sObj.npoints < 6)
       c = 1;
-    for (i = 0; i < s.sprite.npoints; i += c) {
+    for (i = 0; i < s.sObj.npoints; i += c) {
       explosionIndex++;
       if (explosionIndex >= MAX_SCRAP)
         explosionIndex = 0;
       explosions[explosionIndex].active = true;
       explosions[explosionIndex].shape = new Polygon();
       j = i + 1;
-      if (j >= s.sprite.npoints)
-        j -= s.sprite.npoints;
+      if (j >= s.sObj.npoints)
+        j -= s.sObj.npoints;
       cx = (int) ((s.shape.xpoints[i] + s.shape.xpoints[j]) / 2);
       cy = (int) ((s.shape.ypoints[i] + s.shape.ypoints[j]) / 2);
       explosions[explosionIndex].shape.addPoint(
@@ -1033,8 +1021,8 @@ public class Asteroids extends Applet implements Runnable, KeyListener {
     // starting counter.
 
     if (c == 'h' && ship.active && hyperCounter <= 0) {
-      ship.x = Math.random() * AsteroidsSprite.width;
-      ship.y = Math.random() * AsteroidsSprite.height;
+      ship.x = Math.random() * SpaceObject.width;
+      ship.y = Math.random() * SpaceObject.height;
       hyperCounter = HYPER_COUNT;
       if (sound & !paused)
         warpSound.play();
@@ -1163,7 +1151,7 @@ public class Asteroids extends Applet implements Runnable, KeyListener {
     offGraphics.setColor(Color.white);
     for (i = 0; i < MAX_SHOTS; i++)
       if (photons[i].active)
-        offGraphics.drawPolygon(photons[i].sprite);
+        offGraphics.drawPolygon(photons[i].sObj);
 
     // Draw the guided missle, counter is used to quickly fade color to black
     // when near expiration.
@@ -1171,9 +1159,9 @@ public class Asteroids extends Applet implements Runnable, KeyListener {
     c = Math.min(missleCounter * 24, 255);
     offGraphics.setColor(new Color(c, c, c));
     if (missle.active) {
-      offGraphics.drawPolygon(missle.sprite);
-      offGraphics.drawLine(missle.sprite.xpoints[missle.sprite.npoints - 1], missle.sprite.ypoints[missle.sprite.npoints - 1],
-                           missle.sprite.xpoints[0], missle.sprite.ypoints[0]);
+      offGraphics.drawPolygon(missle.sObj);
+      offGraphics.drawLine(missle.sObj.xpoints[missle.sObj.npoints - 1], missle.sObj.ypoints[missle.sObj.npoints - 1],
+                           missle.sObj.xpoints[0], missle.sObj.ypoints[0]);
     }
 
     // Draw the asteroids.
@@ -1182,12 +1170,12 @@ public class Asteroids extends Applet implements Runnable, KeyListener {
       if (asteroids[i].active) {
         if (detail) {
           offGraphics.setColor(Color.black);
-          offGraphics.fillPolygon(asteroids[i].sprite);
+          offGraphics.fillPolygon(asteroids[i].sObj);
         }
         offGraphics.setColor(Color.white);
-        offGraphics.drawPolygon(asteroids[i].sprite);
-        offGraphics.drawLine(asteroids[i].sprite.xpoints[asteroids[i].sprite.npoints - 1], asteroids[i].sprite.ypoints[asteroids[i].sprite.npoints - 1],
-                             asteroids[i].sprite.xpoints[0], asteroids[i].sprite.ypoints[0]);
+        offGraphics.drawPolygon(asteroids[i].sObj);
+        offGraphics.drawLine(asteroids[i].sObj.xpoints[asteroids[i].sObj.npoints - 1], asteroids[i].sObj.ypoints[asteroids[i].sObj.npoints - 1],
+                             asteroids[i].sObj.xpoints[0], asteroids[i].sObj.ypoints[0]);
       }
 
     // Draw the flying saucer.
@@ -1195,12 +1183,12 @@ public class Asteroids extends Applet implements Runnable, KeyListener {
     if (ufo.active) {
       if (detail) {
         offGraphics.setColor(Color.black);
-        offGraphics.fillPolygon(ufo.sprite);
+        offGraphics.fillPolygon(ufo.sObj);
       }
       offGraphics.setColor(Color.white);
-      offGraphics.drawPolygon(ufo.sprite);
-      offGraphics.drawLine(ufo.sprite.xpoints[ufo.sprite.npoints - 1], ufo.sprite.ypoints[ufo.sprite.npoints - 1],
-                           ufo.sprite.xpoints[0], ufo.sprite.ypoints[0]);
+      offGraphics.drawPolygon(ufo.sObj);
+      offGraphics.drawLine(ufo.sObj.xpoints[ufo.sObj.npoints - 1], ufo.sObj.ypoints[ufo.sObj.npoints - 1],
+                           ufo.sObj.xpoints[0], ufo.sObj.ypoints[0]);
     }
 
     // Draw the ship, counter is used to fade color to white on hyperspace.
@@ -1209,26 +1197,26 @@ public class Asteroids extends Applet implements Runnable, KeyListener {
     if (ship.active) {
       if (detail && hyperCounter == 0) {
         offGraphics.setColor(Color.black);
-        offGraphics.fillPolygon(ship.sprite);
+        offGraphics.fillPolygon(ship.sObj);
       }
       offGraphics.setColor(new Color(c, c, c));
-      offGraphics.drawPolygon(ship.sprite);
-      offGraphics.drawLine(ship.sprite.xpoints[ship.sprite.npoints - 1], ship.sprite.ypoints[ship.sprite.npoints - 1],
-                           ship.sprite.xpoints[0], ship.sprite.ypoints[0]);
+      offGraphics.drawPolygon(ship.sObj);
+      offGraphics.drawLine(ship.sObj.xpoints[ship.sObj.npoints - 1], ship.sObj.ypoints[ship.sObj.npoints - 1],
+                           ship.sObj.xpoints[0], ship.sObj.ypoints[0]);
 
       // Draw thruster exhaust if thrusters are on. Do it randomly to get a
       // flicker effect.
 
       if (!paused && detail && Math.random() < 0.5) {
         if (up) {
-          offGraphics.drawPolygon(fwdThruster.sprite);
-          offGraphics.drawLine(fwdThruster.sprite.xpoints[fwdThruster.sprite.npoints - 1], fwdThruster.sprite.ypoints[fwdThruster.sprite.npoints - 1],
-                               fwdThruster.sprite.xpoints[0], fwdThruster.sprite.ypoints[0]);
+          offGraphics.drawPolygon(fwdThruster.sObj);
+          offGraphics.drawLine(fwdThruster.sObj.xpoints[fwdThruster.sObj.npoints - 1], fwdThruster.sObj.ypoints[fwdThruster.sObj.npoints - 1],
+                               fwdThruster.sObj.xpoints[0], fwdThruster.sObj.ypoints[0]);
         }
         if (down) {
-          offGraphics.drawPolygon(revThruster.sprite);
-          offGraphics.drawLine(revThruster.sprite.xpoints[revThruster.sprite.npoints - 1], revThruster.sprite.ypoints[revThruster.sprite.npoints - 1],
-                               revThruster.sprite.xpoints[0], revThruster.sprite.ypoints[0]);
+          offGraphics.drawPolygon(revThruster.sObj);
+          offGraphics.drawLine(revThruster.sObj.xpoints[revThruster.sObj.npoints - 1], revThruster.sObj.ypoints[revThruster.sObj.npoints - 1],
+                               revThruster.sObj.xpoints[0], revThruster.sObj.ypoints[0]);
         }
       }
     }
@@ -1239,7 +1227,7 @@ public class Asteroids extends Applet implements Runnable, KeyListener {
       if (explosions[i].active) {
         c = (255 / SCRAP_COUNT) * explosionCounter [i];
         offGraphics.setColor(new Color(c, c, c));
-        offGraphics.drawPolygon(explosions[i].sprite);
+        offGraphics.drawPolygon(explosions[i].sObj);
       }
 
     // Display status and messages.

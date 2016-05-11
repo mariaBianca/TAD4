@@ -1,26 +1,29 @@
 import java.awt.Polygon;
 
-class AsteroidsSprite {
+class SpaceObject {
+	
+	//initially called the AsteroidsSprite
+	//this class builds the constructor for any spacial object
 
   // Fields:
 
   static int width;          // Dimensions of the graphics area.
   static int height;
 
-  Polygon shape;             // Base sprite shape, centered at the origin (0,0).
+  Polygon shape;             // Base sObj shape, centered at the origin (0,0).
   boolean active;            // Active flag.
   double  angle;             // Current angle of rotation.
   double  deltaAngle;        // Amount to change the rotation angle.
   double  x, y;              // Current position on screen.
   double  deltaX, deltaY;    // Amount to change the screen position.
-  Polygon sprite;            // Final location and shape of sprite after
+  Polygon sObj;            // Final location and shape of sObj after
                              // applying rotation and translation to get screen
                              // position. Used for drawing on the screen and in
                              // detecting collisions.
 
   // Constructors:
 
-  public AsteroidsSprite() {
+  public SpaceObject() {
 
     this.shape = new Polygon();
     this.active = false;
@@ -30,7 +33,7 @@ class AsteroidsSprite {
     this.y = 0.0;
     this.deltaX = 0.0;
     this.deltaY = 0.0;
-    this.sprite = new Polygon();
+    this.sObj = new Polygon();
   }
 
   // Methods:
@@ -39,8 +42,8 @@ class AsteroidsSprite {
 
     boolean wrapped;
 
-    // Update the rotation and position of the sprite based on the delta
-    // values. If the sprite moves off the edge of the screen, it is wrapped
+    // Update the rotation and position of the sObj based on the delta
+    // values. If the sObj moves off the edge of the screen, it is wrapped
     // around to the other side and TRUE is returnd.
 
     this.angle += this.deltaAngle;
@@ -75,27 +78,27 @@ class AsteroidsSprite {
 
     int i;
 
-    // Render the sprite's shape and location by rotating it's base shape and
+    // Render the sObj's shape and location by rotating it's base shape and
     // moving it to it's proper screen position.
 
-    this.sprite = new Polygon();
+    this.sObj = new Polygon();
     for (i = 0; i < this.shape.npoints; i++)
-      this.sprite.addPoint((int) Math.round(this.shape.xpoints[i] * Math.cos(this.angle) + this.shape.ypoints[i] * Math.sin(this.angle)) + (int) Math.round(this.x) + width / 2,
+      this.sObj.addPoint((int) Math.round(this.shape.xpoints[i] * Math.cos(this.angle) + this.shape.ypoints[i] * Math.sin(this.angle)) + (int) Math.round(this.x) + width / 2,
                            (int) Math.round(this.shape.ypoints[i] * Math.cos(this.angle) - this.shape.xpoints[i] * Math.sin(this.angle)) + (int) Math.round(this.y) + height / 2);
   }
 
-  public boolean isColliding(AsteroidsSprite s) {
+  public boolean isColliding(SpaceObject s) {
 
     int i;
 
-    // Determine if one sprite overlaps with another, i.e., if any vertice
-    // of one sprite lands inside the other.
+    // Determine if one sObj overlaps with another, i.e., if any vertice
+    // of one sObj lands inside the other.
 
-    for (i = 0; i < s.sprite.npoints; i++)
-      if (this.sprite.contains(s.sprite.xpoints[i], s.sprite.ypoints[i]))
+    for (i = 0; i < s.sObj.npoints; i++)
+      if (this.sObj.contains(s.sObj.xpoints[i], s.sObj.ypoints[i]))
         return true;
-    for (i = 0; i < this.sprite.npoints; i++)
-      if (s.sprite.contains(this.sprite.xpoints[i], this.sprite.ypoints[i]))
+    for (i = 0; i < this.sObj.npoints; i++)
+      if (s.sObj.contains(this.sObj.xpoints[i], this.sObj.ypoints[i]))
         return true;
     return false;
   }
