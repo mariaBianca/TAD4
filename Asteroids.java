@@ -49,7 +49,7 @@ import java.applet.AudioClip;
   Main applet code.
 ******************************************************************************/
 
-@SuppressWarnings("serial")
+
 public class Asteroids extends Applet implements Runnable, KeyListener {
 
   // Copyright information.
@@ -137,7 +137,7 @@ public class Asteroids extends Applet implements Runnable, KeyListener {
   boolean paused;
   static boolean playing;
   static boolean sound;
-  boolean detail;
+  static boolean detail;
 
   // Key flags.
 
@@ -154,7 +154,7 @@ public class Asteroids extends Applet implements Runnable, KeyListener {
   Missile missile = new Missile();
   static SpaceObject[] photons    = new SpaceObject[MAX_SHOTS];
   SpaceObject[] asteroids  = new SpaceObject[MAX_ROCKS];
-  SpaceObject[] explosions = new SpaceObject[MAX_SCRAP];
+  Explosion[] explosion = new Explosion[MAX_SCRAP];
 
   // Ship data.
 
@@ -185,8 +185,8 @@ public class Asteroids extends Applet implements Runnable, KeyListener {
 
   // Explosion data.
 
-  int[] explosionCounter = new int[MAX_SCRAP];  // Time counters for explosions.
-  int   explosionIndex;                         // Next available explosion sObj.
+  static int[] explosionCounter = new int[MAX_SCRAP];  // Time counters for explosions.
+  static int   explosionIndex;                         // Next available explosion sObj.
 
   // Sound clips.
 
@@ -280,7 +280,7 @@ public class Asteroids extends Applet implements Runnable, KeyListener {
     // Create explosion sprites.
 
     for (i = 0; i < MAX_SCRAP; i++)
-      explosions[i] = new SpaceObject();
+      explosion[i] = new Explosion();
 
     // Initialize game data and put us in 'game over' mode.
 
@@ -584,8 +584,8 @@ public class Asteroids extends Applet implements Runnable, KeyListener {
     int i;
 
     for (i = 0; i < MAX_SCRAP; i++) {
-      explosions[i].shape = new Polygon();
-      explosions[i].active = false;
+      explosion[i].shape = new Polygon();
+      explosion[i].active = false;
       explosionCounter[i] = 0;
     }
     explosionIndex = 0;
@@ -608,25 +608,25 @@ public class Asteroids extends Applet implements Runnable, KeyListener {
       explosionIndex++;
       if (explosionIndex >= MAX_SCRAP)
         explosionIndex = 0;
-      explosions[explosionIndex].active = true;
-      explosions[explosionIndex].shape = new Polygon();
+      explosion[explosionIndex].active = true;
+      explosion[explosionIndex].shape = new Polygon();
       j = i + 1;
       if (j >= s.sObj.npoints)
         j -= s.sObj.npoints;
       cx = (int) ((s.shape.xpoints[i] + s.shape.xpoints[j]) / 2);
       cy = (int) ((s.shape.ypoints[i] + s.shape.ypoints[j]) / 2);
-      explosions[explosionIndex].shape.addPoint(
+      explosion[explosionIndex].shape.addPoint(
         s.shape.xpoints[i] - cx,
         s.shape.ypoints[i] - cy);
-      explosions[explosionIndex].shape.addPoint(
+      explosion[explosionIndex].shape.addPoint(
         s.shape.xpoints[j] - cx,
         s.shape.ypoints[j] - cy);
-      explosions[explosionIndex].x = s.x + cx;
-      explosions[explosionIndex].y = s.y + cy;
-      explosions[explosionIndex].angle = s.angle;
-      explosions[explosionIndex].deltaAngle = 4 * (Math.random() * 2 * MAX_ROCK_SPIN - MAX_ROCK_SPIN);
-      explosions[explosionIndex].deltaX = (Math.random() * 2 * MAX_ROCK_SPEED - MAX_ROCK_SPEED + s.deltaX) / 2;
-      explosions[explosionIndex].deltaY = (Math.random() * 2 * MAX_ROCK_SPEED - MAX_ROCK_SPEED + s.deltaY) / 2;
+      explosion[explosionIndex].x = s.x + cx;
+      explosion[explosionIndex].y = s.y + cy;
+      explosion[explosionIndex].angle = s.angle;
+      explosion[explosionIndex].deltaAngle = 4 * (Math.random() * 2 * MAX_ROCK_SPIN - MAX_ROCK_SPIN);
+      explosion[explosionIndex].deltaX = (Math.random() * 2 * MAX_ROCK_SPEED - MAX_ROCK_SPEED + s.deltaX) / 2;
+      explosion[explosionIndex].deltaY = (Math.random() * 2 * MAX_ROCK_SPEED - MAX_ROCK_SPEED + s.deltaY) / 2;
       explosionCounter[explosionIndex] = SCRAP_COUNT;
     }
   }
@@ -639,11 +639,11 @@ public class Asteroids extends Applet implements Runnable, KeyListener {
     // expired.
 
     for (i = 0; i < MAX_SCRAP; i++)
-      if (explosions[i].active) {
-        explosions[i].advance();
-        explosions[i].render();
+      if (explosion[i].active) {
+        explosion[i].advance();
+        explosion[i].render();
         if (--explosionCounter[i] < 0)
-          explosions[i].active = false;
+          explosion[i].active = false;
       }
   }
 
@@ -895,10 +895,10 @@ public class Asteroids extends Applet implements Runnable, KeyListener {
     // Draw any explosion debris, counters are used to fade color to black.
 
     for (i = 0; i < MAX_SCRAP; i++)
-      if (explosions[i].active) {
+      if (explosion[i].active) {
         c = (255 / SCRAP_COUNT) * explosionCounter [i];
         offGraphics.setColor(new Color(c, c, c));
-        offGraphics.drawPolygon(explosions[i].sObj);
+        offGraphics.drawPolygon(explosion[i].sObj);
       }
 
     // Display status and messages.
