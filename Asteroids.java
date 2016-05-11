@@ -135,31 +135,31 @@ public class Asteroids extends Applet implements Runnable, KeyListener {
 
   static boolean loaded = false;
   boolean paused;
-  boolean playing;
+  static boolean playing;
   static boolean sound;
   boolean detail;
 
   // Key flags.
 
-  boolean left  = false;
-  boolean right = false;
-  boolean up    = false;
-  boolean down  = false;
+  static boolean left  = false;
+  static boolean right = false;
+  static boolean up    = false;
+  static boolean down  = false;
 
   // sObj objects.
 
-  SpaceObject   ship;
-  Thruster   fwdThruster, revThruster;
-  UFOclass   ufo;
-  Missile missile;
+  Ship  ship = new Ship();
+  Thruster   fwdThruster , revThruster;
+  UFOclass   ufo = new UFOclass();
+  Missile missile = new Missile();
   static SpaceObject[] photons    = new SpaceObject[MAX_SHOTS];
   SpaceObject[] asteroids  = new SpaceObject[MAX_ROCKS];
   SpaceObject[] explosions = new SpaceObject[MAX_SCRAP];
 
   // Ship data.
 
-  int shipsLeft;       // Number of ships left in game, including current one.
-  int shipCounter;     // Timer counter for ship explosion.
+  static int shipsLeft;       // Number of ships left in game, including current one.
+  static int shipCounter;     // Timer counter for ship explosion.
   static int hyperCounter;    // Timer counter for hyperspace.
 
   // Photon data.
@@ -200,7 +200,7 @@ public class Asteroids extends Applet implements Runnable, KeyListener {
 
   // Flags for looping sound clips.
 
-  boolean thrustersPlaying;
+  static boolean thrustersPlaying;
   static boolean saucerPlaying;
   static boolean misslePlaying;
 
@@ -255,13 +255,7 @@ public class Asteroids extends Applet implements Runnable, KeyListener {
     for (i = 0; i < numStars; i++)
       stars[i] = new Point((int) (Math.random() * SpaceObject.width), (int) (Math.random() * SpaceObject.height));
 
-    // Create shape for the ship sObj.
-
-    ship = new SpaceObject();
-    ship.shape.addPoint(0, -10);
-    ship.shape.addPoint(7, 10);
-    ship.shape.addPoint(-7, 10);
-
+  
     // Create shapes for the ship thrusters.
 
     fwdThruster = Thruster.fwdThruster;
@@ -327,7 +321,7 @@ public class Asteroids extends Applet implements Runnable, KeyListener {
 
         // Move and process all sprites.
 
-        updateShip();
+        ship.updateShip();
         updatePhotons();
         UFOclass.updateUfo();
         missile.updateMissle();
@@ -409,133 +403,6 @@ public class Asteroids extends Applet implements Runnable, KeyListener {
       repaint(); Thread.currentThread().sleep(DELAY);
     }
     catch (InterruptedException e) {}
-  }
-
-  public void initShip() {
-
-    // Reset the ship sObj at the center of the screen.
-
-    ship.active = true;
-    ship.angle = 0.0;
-    ship.deltaAngle = 0.0;
-    ship.x = 0.0;
-    ship.y = 0.0;
-    ship.deltaX = 0.0;
-    ship.deltaY = 0.0;
-    ship.render();
-
-    // Initialize thruster sprites.
-
-    fwdThruster.x = ship.x;
-    fwdThruster.y = ship.y;
-    fwdThruster.angle = ship.angle;
-    fwdThruster.render();
-    revThruster.x = ship.x;
-    revThruster.y = ship.y;
-    revThruster.angle = ship.angle;
-    revThruster.render();
-
-    if (loaded)
-      thrustersSound.stop();
-    thrustersPlaying = false;
-    hyperCounter = 0;
-  }
-
-  public void updateShip() {
-
-    double dx, dy, speed;
-
-    if (!playing)
-      return;
-
-    // Rotate the ship if left or right cursor key is down.
-
-    if (left) {
-      ship.angle += SHIP_ANGLE_STEP;
-      if (ship.angle > 2 * Math.PI)
-        ship.angle -= 2 * Math.PI;
-    }
-    if (right) {
-      ship.angle -= SHIP_ANGLE_STEP;
-      if (ship.angle < 0)
-        ship.angle += 2 * Math.PI;
-    }
-
-    // Fire thrusters if up or down cursor key is down.
-
-    dx = SHIP_SPEED_STEP * -Math.sin(ship.angle);
-    dy = SHIP_SPEED_STEP *  Math.cos(ship.angle);
-    if (up) {
-      ship.deltaX += dx;
-      ship.deltaY += dy;
-    }
-    if (down) {
-        ship.deltaX -= dx;
-        ship.deltaY -= dy;
-    }
-
-    // Don't let ship go past the speed limit.
-
-    if (up || down) {
-      speed = Math.sqrt(ship.deltaX * ship.deltaX + ship.deltaY * ship.deltaY);
-      if (speed > MAX_SHIP_SPEED) {
-        dx = MAX_SHIP_SPEED * -Math.sin(ship.angle);
-        dy = MAX_SHIP_SPEED *  Math.cos(ship.angle);
-        if (up)
-          ship.deltaX = dx;
-        else
-          ship.deltaX = -dx;
-        if (up)
-          ship.deltaY = dy;
-        else
-          ship.deltaY = -dy;
-      }
-    }
-
-    // Move the ship. If it is currently in hyperspace, advance the countdown.
-
-    if (ship.active) {
-      ship.advance();
-      ship.render();
-      if (hyperCounter > 0)
-        hyperCounter--;
-
-      // Update the thruster sprites to match the ship sObj.
-
-      fwdThruster.x = ship.x;
-      fwdThruster.y = ship.y;
-      fwdThruster.angle = ship.angle;
-      fwdThruster.render();
-      revThruster.x = ship.x;
-      revThruster.y = ship.y;
-      revThruster.angle = ship.angle;
-      revThruster.render();
-    }
-
-    // Ship is exploding, advance the countdown or create a new ship if it is
-    // done exploding. The new ship is added as though it were in hyperspace.
-    // (This gives the player time to move the ship if it is in imminent
-    // danger.) If that was the last ship, end the game.
-
-    else
-      if (--shipCounter <= 0)
-        if (shipsLeft > 0) {
-          initShip();
-          hyperCounter = HYPER_COUNT;
-        }
-        else
-          GameSettings.endGame();
-  }
-
-  public void stopShip() {
-
-    ship.active = false;
-    shipCounter = SCRAP_COUNT;
-    if (shipsLeft > 0)
-      shipsLeft--;
-    if (loaded)
-      thrustersSound.stop();
-    thrustersPlaying = false;
   }
 
   public void initPhotons() {
@@ -705,7 +572,7 @@ public class Asteroids extends Applet implements Runnable, KeyListener {
           if (sound)
             crashSound.play();
           explode(ship);
-          stopShip();
+          ship.stopShip();
           UFOclass.stopUfo();
           missile.stopMissle();
         }
