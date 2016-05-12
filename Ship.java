@@ -3,7 +3,7 @@ public class Ship extends SpaceObject{
 
 	//this class represents the definition and the implementations of the Object Ship
 	
-	Ship ship = new Ship();
+	SpaceObject ship = new SpaceObject();
 	Thruster fwdThruster = new Thruster();
 	Thruster revThruster = new Thruster();
 	

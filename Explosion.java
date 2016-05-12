@@ -33,12 +33,12 @@ public class Explosion extends SpaceObject {
 
 	    s.render();
 	    c = 2;
-	    if (Asteroids.detail || s.sObj.npoints < 6)
+	    if (AsteroidGame.detail || s.sObj.npoints < 6)
 	      c = 1;
 	    for (i = 0; i < s.sObj.npoints; i += c) {
-	      Asteroids.explosionIndex++;
-	      if (Asteroids.explosionIndex >= Asteroids.MAX_SCRAP)
-	        Asteroids.explosionIndex = 0;
+	      AsteroidGame.explosionIndex++;
+	      if (AsteroidGame.explosionIndex >= AsteroidGame.MAX_SCRAP)
+	        AsteroidGame.explosionIndex = 0;
 	      explosion.active = true;
 	      explosion.shape = new Polygon();
 	      j = i + 1;
@@ -55,10 +55,10 @@ public class Explosion extends SpaceObject {
 	      explosion.x = s.x + cx;
 	      explosion.y = s.y + cy;
 	      explosion.angle = s.angle;
-	      explosion.deltaAngle = 4 * (Math.random() * 2 * Asteroids.MAX_ROCK_SPIN - Asteroids.MAX_ROCK_SPIN);
-	      explosion.deltaX = (Math.random() * 2 * Asteroids.MAX_ROCK_SPEED - Asteroids.MAX_ROCK_SPEED + s.deltaX) / 2;
-	      explosion.deltaY = (Math.random() * 2 * Asteroids.MAX_ROCK_SPEED - Asteroids.MAX_ROCK_SPEED + s.deltaY) / 2;
-	     // Asteroids.explosionCounter = Asteroids.SCRAP_COUNT;
+	      explosion.deltaAngle = 4 * (Math.random() * 2 * AsteroidGame.MAX_ROCK_SPIN - AsteroidGame.MAX_ROCK_SPIN);
+	      explosion.deltaX = (Math.random() * 2 * AsteroidGame.MAX_ROCK_SPEED - AsteroidGame.MAX_ROCK_SPEED + s.deltaX) / 2;
+	      explosion.deltaY = (Math.random() * 2 * AsteroidGame.MAX_ROCK_SPEED - AsteroidGame.MAX_ROCK_SPEED + s.deltaY) / 2;
+	     // AsteroidGame.explosionCounter = AsteroidGame.SCRAP_COUNT;
 	    }
 	  }
 
@@ -69,11 +69,11 @@ public class Explosion extends SpaceObject {
 	    // Move any active explosion debris. Stop explosion when its counter has
 	    // expired.
 
-	    for (i = 0; i < Asteroids.MAX_SCRAP; i++)
+	    for (i = 0; i < AsteroidGame.MAX_SCRAP; i++)
 	      if (explosion.active) {
 	        explosion.advance();
 	        explosion.render();
-	        if (--Asteroids.explosionCounter[i] < 0)
+	        if (--AsteroidGame.explosionCounter[i] < 0)
 	          explosion.active = false;
 	      }
 	  }

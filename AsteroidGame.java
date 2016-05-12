@@ -57,6 +57,11 @@ public class AsteroidGame extends Applet implements Runnable, KeyListener {
 
   Thread loadThread;
   Thread loopThread;
+  	
+		
+
+	
+	  
 
   // Constants
 
@@ -180,26 +185,6 @@ public class AsteroidGame extends Applet implements Runnable, KeyListener {
   static int[] explosionCounter = new int[MAX_SCRAP];  // Time counters for explosions.
   static int   explosionIndex;                         // Next available explosion sObj.
 
-  // Sound clips.
-
-  static AudioClip crashSound;
-  AudioClip explosionSound;
-  AudioClip fireSound;
-  static AudioClip missleSound;
-  static AudioClip saucerSound;
-  AudioClip thrustersSound;
-  AudioClip warpSound;
-
-  // Flags for looping sound clips.
-
-  static boolean thrustersPlaying;
-  static boolean saucerPlaying;
-  static boolean misslePlaying;
-
-  // Counter and total used to track the loading of the sound clips.
-
-  int clipTotal   = 0;
-  int clipsLoaded = 0;
 
   // Off screen image.
 
@@ -232,7 +217,7 @@ public class AsteroidGame extends Applet implements Runnable, KeyListener {
 
     // Set up key event handling and set focus to applet window.
 
-    addKeyListener(this);
+    addKeyListener((KeyListener) this);
     requestFocus();
 
     // Save the screen size.
@@ -297,13 +282,7 @@ public class AsteroidGame extends Applet implements Runnable, KeyListener {
     Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
     startTime = System.currentTimeMillis();
 
-    // Run thread for loading sounds.
-
-    if (!loaded && Thread.currentThread() == loadThread) {
-      loadSounds();
-      loaded = true;
-      loadThread.stop();
-    }
+   
 
     // This is the main loop.
 
@@ -355,47 +334,7 @@ public class AsteroidGame extends Applet implements Runnable, KeyListener {
     }
   }
 
-  public void loadSounds() {
-
-    // Load all sound clips by playing and immediately stopping them. Update
-    // counter and total for display.
-
-    try {
-      crashSound     = getAudioClip(new URL(getCodeBase(), "crash.au"));
-      clipTotal++;
-      explosionSound = getAudioClip(new URL(getCodeBase(), "explosion.au"));
-      clipTotal++;
-      fireSound      = getAudioClip(new URL(getCodeBase(), "fire.au"));
-      clipTotal++;
-      missleSound    = getAudioClip(new URL(getCodeBase(), "missile.au"));
-      clipTotal++;
-      saucerSound    = getAudioClip(new URL(getCodeBase(), "saucer.au"));
-      clipTotal++;
-      thrustersSound = getAudioClip(new URL(getCodeBase(), "thrusters.au"));
-      clipTotal++;
-      warpSound      = getAudioClip(new URL(getCodeBase(), "warp.au"));
-      clipTotal++;
-    }
-    catch (MalformedURLException e) {}
-
-    try {
-      crashSound.play();     crashSound.stop();     clipsLoaded++;
-      repaint(); Thread.currentThread().sleep(DELAY);
-      explosionSound.play(); explosionSound.stop(); clipsLoaded++;
-      repaint(); Thread.currentThread().sleep(DELAY);
-      fireSound.play();      fireSound.stop();      clipsLoaded++;
-      repaint(); Thread.currentThread().sleep(DELAY);
-      missleSound.play();    missleSound.stop();    clipsLoaded++;
-      repaint(); Thread.currentThread().sleep(DELAY);
-      saucerSound.play();    saucerSound.stop();    clipsLoaded++;
-      repaint(); Thread.currentThread().sleep(DELAY);
-      thrustersSound.play(); thrustersSound.stop(); clipsLoaded++;
-      repaint(); Thread.currentThread().sleep(DELAY);
-      warpSound.play();      warpSound.stop();      clipsLoaded++;
-      repaint(); Thread.currentThread().sleep(DELAY);
-    }
-    catch (InterruptedException e) {}
-  }
+  
 
   public void initPhotons() {
 
@@ -547,7 +486,7 @@ public class AsteroidGame extends Applet implements Runnable, KeyListener {
             asteroids[i].active = false;
             photons[j].active = false;
             if (sound)
-              explosionSound.play();
+              Audio.explosionSound.play();
             explode(asteroids[i]);
             if (!asteroidIsSmall[i]) {
               score += BIG_POINTS;
@@ -562,7 +501,7 @@ public class AsteroidGame extends Applet implements Runnable, KeyListener {
         if (ship.active && hyperCounter <= 0 &&
             asteroids[i].active && asteroids[i].isColliding(ship)) {
           if (sound)
-            crashSound.play();
+            Audio.crashSound.play();
           explode(ship);
           ship.stopShip();
           UFOclass.stopUfo();
@@ -654,17 +593,17 @@ public class AsteroidGame extends Applet implements Runnable, KeyListener {
     if (e.getKeyCode() == KeyEvent.VK_DOWN)
       down = true;
 
-    if ((up || down) && ship.active && !thrustersPlaying) {
+    if ((up || down) && ship.active && !Audio.thrustersPlaying) {
       if (sound && !paused)
-        thrustersSound.loop();
-      thrustersPlaying = true;
+        Audio.thrustersSound.loop();
+      Audio.thrustersPlaying = true;
     }
 
     // Spacebar: fire a photon and start its counter.
 
     if (e.getKeyChar() == ' ' && ship.active) {
       if (sound & !paused)
-        fireSound.play();
+        Audio.fireSound.play();
       photonTime = System.currentTimeMillis();
       photonIndex++;
       if (photonIndex >= MAX_SHOTS)
@@ -688,7 +627,7 @@ public class AsteroidGame extends Applet implements Runnable, KeyListener {
       ship.y = Math.random() * SpaceObject.height;
       hyperCounter = HYPER_COUNT;
       if (sound & !paused)
-        warpSound.play();
+        Audio.warpSound.play();
     }
 
     // 'P' key: toggle pause mode and start or stop any active looping sound
@@ -696,20 +635,20 @@ public class AsteroidGame extends Applet implements Runnable, KeyListener {
 
     if (c == 'p') {
       if (paused) {
-        if (sound && misslePlaying)
-          missleSound.loop();
-        if (sound && saucerPlaying)
-          saucerSound.loop();
-        if (sound && thrustersPlaying)
-          thrustersSound.loop();
+        if (sound && Audio.misslePlaying)
+          Audio.missleSound.loop();
+        if (sound && Audio.saucerPlaying)
+          Audio.saucerSound.loop();
+        if (sound && Audio.thrustersPlaying)
+          Audio.thrustersSound.loop();
       }
       else {
-        if (misslePlaying)
-          missleSound.stop();
-        if (saucerPlaying)
-          saucerSound.stop();
-        if (thrustersPlaying)
-          thrustersSound.stop();
+        if (Audio.misslePlaying)
+          Audio.missleSound.stop();
+        if (Audio.saucerPlaying)
+          Audio.saucerSound.stop();
+        if (Audio.thrustersPlaying)
+         Audio.thrustersSound.stop();
       }
       paused = !paused;
     }
@@ -718,21 +657,21 @@ public class AsteroidGame extends Applet implements Runnable, KeyListener {
 
     if (c == 'm' && loaded) {
       if (sound) {
-        crashSound.stop();
-        explosionSound.stop();
-        fireSound.stop();
-        missleSound.stop();
-        saucerSound.stop();
-        thrustersSound.stop();
-        warpSound.stop();
+       Audio.crashSound.stop();
+       Audio.explosionSound.stop();
+        Audio.fireSound.stop();
+        Audio.missleSound.stop();
+        Audio.saucerSound.stop();
+        Audio.thrustersSound.stop();
+        Audio.warpSound.stop();
       }
       else {
-        if (misslePlaying && !paused)
-          missleSound.loop();
-        if (saucerPlaying && !paused)
-          saucerSound.loop();
-        if (thrustersPlaying && !paused)
-          thrustersSound.loop();
+        if (Audio.misslePlaying && !paused)
+          Audio.missleSound.loop();
+        if (Audio.saucerPlaying && !paused)
+          Audio.saucerSound.loop();
+        if (Audio.thrustersPlaying && !paused)
+          Audio.thrustersSound.loop();
       }
       sound = !sound;
     }
@@ -769,9 +708,9 @@ public class AsteroidGame extends Applet implements Runnable, KeyListener {
     if (e.getKeyCode() == KeyEvent.VK_DOWN)
       down = false;
 
-    if (!up && !down && thrustersPlaying) {
-      thrustersSound.stop();
-      thrustersPlaying = false;
+    if (!up && !down && Audio.thrustersPlaying) {
+      Audio.thrustersSound.stop();
+      Audio.thrustersPlaying = false;
     }
   }
 
@@ -925,8 +864,8 @@ public class AsteroidGame extends Applet implements Runnable, KeyListener {
         offGraphics.setColor(Color.black);
           offGraphics.fillRect(x, y, w, h);
         offGraphics.setColor(Color.gray);
-        if (clipTotal > 0)
-          offGraphics.fillRect(x, y, (int) (w * clipsLoaded / clipTotal), h);
+        if (Audio.clipTotal > 0)
+          offGraphics.fillRect(x, y, (int) (w * Audio.clipsLoaded / Audio.clipTotal), h);
         offGraphics.setColor(Color.white);
         offGraphics.drawRect(x, y, w, h);
         offGraphics.drawString(s, x + 2 * fontWidth, y + fm.getMaxAscent());
@@ -947,4 +886,25 @@ public class AsteroidGame extends Applet implements Runnable, KeyListener {
 
     g.drawImage(offImage, 0, 0, this);
   }
-} 
+}
+
+/* public void keyPressed(KeyEvent arg0) {
+	// TODO Auto-generated method stub
+	
+}
+
+public void keyReleased(KeyEvent arg0) {
+	// TODO Auto-generated method stub
+	
+}
+
+public void keyTyped(KeyEvent arg0) {
+	// TODO Auto-generated method stub
+	
+}
+
+public void run() {
+	// TODO Auto-generated method stub
+}
+*/	
+ 
