@@ -18,6 +18,4 @@ public static void defineFwdThruster(Thruster fwdThruster){
 		revThruster.shape.addPoint(2, 20);
 		revThruster.shape.addPoint(0, 14);
 	}
-
-
 }
