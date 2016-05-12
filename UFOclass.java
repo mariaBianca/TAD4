@@ -38,9 +38,9 @@ public class UFOclass extends SpaceObject{
 		    if (ufo.y > 0)
 		      ufo.deltaY = ufo.deltaY;
 		    ufo.render();
-		    AsteroidGame.saucerPlaying = true;
+		    Audio.saucerPlaying = true;
 		    if (AsteroidGame.sound)
-		      AsteroidGame.saucerSound.loop();
+		      Audio.saucerSound.loop();
 		    AsteroidGame.ufoCounter = (int) Math.abs(SpaceObject.width / ufo.deltaX);
 		  }
 	  
@@ -90,8 +90,8 @@ public class UFOclass extends SpaceObject{
 		    AsteroidGame.ufoCounter = 0;
 		    AsteroidGame.ufoPassesLeft = 0;
 		    if (AsteroidGame.loaded)
-		      AsteroidGame.saucerSound.stop();
-		    AsteroidGame.saucerPlaying = false;
+		      Audio.saucerSound.stop();
+		    Audio.saucerPlaying = false;
 		  }
 
 }
