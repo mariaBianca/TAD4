@@ -31,8 +31,4 @@ public class Audio {
 	  
 	  
 	
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> e929581dc911aea34b11c8de3274f5c83632913a

@@ -2,7 +2,7 @@
 public class Missile extends SpaceObject{
 	
 	SpaceObject missile = new SpaceObject();
-	UFOclass ufo = new UFOclass();
+	UFO ufo = new UFO();
 	SpaceObject ship = new SpaceObject();
 	
 	
@@ -57,17 +57,17 @@ public class Missile extends SpaceObject{
 	          if (AsteroidGame.photons[i].active && missile.isColliding(AsteroidGame.photons[i])) {
 	            if (AsteroidGame.sound)
 	              Audio.crashSound.play();
-	            //explode(missile);
+	            Explosion.explode(missile);
 	            stopMissle();
 	            AsteroidGame.score += AsteroidGame.MISSLE_POINTS;
 	          }
 	        if (missile.active && ship.active &&
 	            AsteroidGame.hyperCounter <= 0 && ship.isColliding(missile)) {
 	          if (AsteroidGame.sound)
-	            //crashSound.play();
-	          //explode(ship);
-	          //stopShip();
-	          UFOclass.stopUfo();
+	           Audio.crashSound.play();
+	          Explosion.explode(ship);
+	          Ship.stopShip();
+	          UFO.stopUfo();
 	          stopMissle();
 	        }
 	      }
@@ -111,9 +111,9 @@ public class Missile extends SpaceObject{
 	    missile.deltaY = 0.75 * AsteroidGame.MAX_ROCK_SPEED *  Math.cos(missile.angle);
 	  }
 
-	  public void stopMissle() {
+	  public static void stopMissle() {
 
-	    missile.active = false;
+	    active = false;
 	    AsteroidGame.missleCounter = 0;
 	    if (AsteroidGame.loaded)
 	      //missleSound.stop();

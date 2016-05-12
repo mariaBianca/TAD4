@@ -1,7 +1,7 @@
 
-public class UFOclass extends SpaceObject{
+public class UFO extends SpaceObject{
 	
-	static UFOclass ufo = new UFOclass();
+	static UFO ufo = new UFO();
 	
 	
 	public void createUFO(){
@@ -56,7 +56,7 @@ public class UFOclass extends SpaceObject{
 		    if (ufo.active) {
 		      if (--AsteroidGame.ufoCounter <= 0) {
 		        if (--AsteroidGame.ufoPassesLeft > 0)
-		          UFOclass.initUfo();
+		          UFO.initUfo();
 		        else
 		          stopUfo();
 		      }

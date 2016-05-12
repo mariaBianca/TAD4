@@ -56,8 +56,8 @@ public class AsteroidGame extends Applet implements Runnable, KeyListener {
 
   // Thread control variables.
 
-  Thread loadThread;
-  Thread loopThread;
+  static Thread loadThread;
+  static Thread loopThread;
 
   // Constants
 
@@ -67,7 +67,7 @@ public class AsteroidGame extends Applet implements Runnable, KeyListener {
 
   static final int MAX_SHOTS =  8;          // Maximum number of sprites
   static final int MAX_ROCKS =  8;          // for photons, asteroids and
-  static final int MAX_SCRAP = 40;          // explosions.
+
 
   static final int SCRAP_COUNT  = 2 * FPS;  // Timer counter starting values
   static final int HYPER_COUNT  = 3 * FPS;  // calculated using number of
@@ -86,12 +86,6 @@ public class AsteroidGame extends Applet implements Runnable, KeyListener {
                                             // each game.
   static final int UFO_PASSES = 3;          // Number of passes for flying
                                             // saucer per appearance.
-
-  // Ship's rotation and acceleration rates and maximum speed.
-
-  static final double SHIP_ANGLE_STEP = Math.PI / FPS;
-  static final double SHIP_SPEED_STEP = 15.0 / FPS;
-  static final double MAX_SHIP_SPEED  = 1.25 * MAX_ROCK_SPEED;
 
   static final int FIRE_DELAY = 50;         // Minimum number of milliseconds
                                             // required between photon shots.
@@ -142,12 +136,12 @@ public class AsteroidGame extends Applet implements Runnable, KeyListener {
   // sObj objects.
 
   static Ship  ship = new Ship();
-  Thruster   fwdThruster , revThruster;
-  UFOclass   ufo = new UFOclass();
+  static Thruster   fwdThruster , revThruster;
+  UFO   ufo = new UFO();
   static Missile missile = new Missile();
   static SpaceObject[] photons    = new SpaceObject[MAX_SHOTS];
   static SpaceObject[] asteroids  = new SpaceObject[MAX_ROCKS];
-  static Explosion[] explosion = new Explosion[MAX_SCRAP];
+  static Explosion[] explosion = new Explosion[Explosion.MAX_SCRAP];
 
   // Ship data.
 
@@ -157,7 +151,7 @@ public class AsteroidGame extends Applet implements Runnable, KeyListener {
 
   // Photon data.
 
-  int   photonIndex;    // Index to next available photon sObj.
+  static int   photonIndex;    // Index to next available photon sObj.
   long  photonTime;     // Time value used to keep firing rate constant.
 
   // Flying saucer data.
@@ -169,18 +163,7 @@ public class AsteroidGame extends Applet implements Runnable, KeyListener {
 
   static int missleCounter;    // Counter for life of missile.
 
-  // Asteroid data.
-
-  static boolean[] asteroidIsSmall = new boolean[MAX_ROCKS];    // Asteroid size flag.
-  static int       asteroidsCounter;                            // Break-time counter.
-  static double    asteroidsSpeed;                              // Asteroid speed.
-  static int       asteroidsLeft;                               // Number of active asteroids.
-
-  // Explosion data.
-
-  static int[] explosionCounter = new int[MAX_SCRAP];  // Time counters for explosions.
-  static int   explosionIndex;                         // Next available explosion sObj.
-
+ 
 
   // Off screen image.
 
@@ -209,7 +192,7 @@ public class AsteroidGame extends Applet implements Runnable, KeyListener {
 
     // Display copyright information.
 
-    System.out.println(copyText);
+    //System.out.println(copyText);
 
     // Set up key event handling and set focus to applet window.
 
@@ -233,7 +216,7 @@ public class AsteroidGame extends Applet implements Runnable, KeyListener {
 
     fwdThruster = Thruster.fwdThruster;
     revThruster = Thruster.revThruster;
-    ufo = UFOclass.ufo;
+    ufo = UFO.ufo;
 
     // Create shape for each photon sprites.
 
@@ -245,14 +228,14 @@ public class AsteroidGame extends Applet implements Runnable, KeyListener {
       photons[i].shape.addPoint(-1, -1);
     }
     
-    // Create asteroid sprites.
+    // Create asteroid objects.
 
     for (i = 0; i < MAX_ROCKS; i++)
       asteroids[i] = new SpaceObject();
 
-    // Create explosion sprites.
+    // Create explosion objects.
 
-    for (i = 0; i < MAX_SCRAP; i++)
+    for (i = 0; i < Explosion.MAX_SCRAP; i++)
       explosion[i] = new Explosion();
 
     // Initialize game data and put us in 'game over' mode.
@@ -263,11 +246,8 @@ public class AsteroidGame extends Applet implements Runnable, KeyListener {
     GameSettings.initGame();
     GameSettings.endGame();
   }
-  
-
 
   public void run() {
-	  
 	 GameSettings gameSettings = new GameSettings();
 
     int i, j;
@@ -290,7 +270,7 @@ public class AsteroidGame extends Applet implements Runnable, KeyListener {
 
         ship.updateShip();
         updatePhotons();
-        UFOclass.updateUfo();
+        UFO.updateUfo();
         missile.updateMissle();
         Asteroid.updateAsteroids();
         Explosion.updateExplosions();
@@ -307,13 +287,13 @@ public class AsteroidGame extends Applet implements Runnable, KeyListener {
         if (playing && score > newUfoScore && !ufo.active) {
           newUfoScore += NEW_UFO_POINTS;
           ufoPassesLeft = UFO_PASSES;
-          UFOclass.initUfo();
+          UFO.initUfo();
         }
 
         // If all asteroids have been destroyed create a new batch.
 
-        if (asteroidsLeft <= 0)
-            if (--asteroidsCounter <= 0)
+        if (Asteroid.asteroidsLeft <= 0)
+            if (--Asteroid.asteroidsCounter <= 0)
               Asteroid.initAsteroids();
       }
 
@@ -330,7 +310,7 @@ public class AsteroidGame extends Applet implements Runnable, KeyListener {
     }
   }
 
-  public void initPhotons() {
+  public static void initPhotons() {
 
     int i;
 
@@ -537,11 +517,11 @@ public class AsteroidGame extends Applet implements Runnable, KeyListener {
 
     c = Math.min(missleCounter * 24, 255);
     offGraphics.setColor(new Color(c, c, c));
-//    if (missile.active == true) {
-//      offGraphics.drawPolygon(missile.sObj);
-//      offGraphics.drawLine(missile.sObj.xpoints[missile.sObj.npoints - 1], missile.sObj.ypoints[missile.sObj.npoints - 1],
-//                           missile.sObj.xpoints[0], missile.sObj.ypoints[0]);
-    //}
+    if (missile.active == true) {
+      offGraphics.drawPolygon(missile.sObj);
+      offGraphics.drawLine(missile.sObj.xpoints[missile.sObj.npoints - 1], missile.sObj.ypoints[missile.sObj.npoints - 1],
+                           missile.sObj.xpoints[0], missile.sObj.ypoints[0]);
+    }
 
     // Draw the asteroids.
 
@@ -602,9 +582,9 @@ public class AsteroidGame extends Applet implements Runnable, KeyListener {
 
     // Draw any explosion debris, counters are used to fade color to black.
 
-    for (i = 0; i < MAX_SCRAP; i++)
+    for (i = 0; i < Explosion.MAX_SCRAP; i++)
       if (explosion[i].active) {
-        c = (255 / SCRAP_COUNT) * explosionCounter [i];
+        c = (255 / SCRAP_COUNT) * Explosion.explosionCounter [i];
         offGraphics.setColor(new Color(c, c, c));
         offGraphics.drawPolygon(explosion[i].sObj);
       }

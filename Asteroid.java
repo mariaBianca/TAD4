@@ -2,6 +2,15 @@ import java.awt.Polygon;
 
 public class Asteroid {
 	
+	  // Asteroid data.
+
+	  static boolean[] asteroidIsSmall = new boolean[AsteroidGame.MAX_ROCKS];    // Asteroid size flag.
+	  static int       asteroidsCounter;                            // Break-time counter.
+	  static double    asteroidsSpeed;                              // Asteroid speed.
+	  static int       asteroidsLeft;                               // Number of active asteroids.
+
+
+	
 	
 	  public static void initAsteroids() {
 
@@ -46,21 +55,21 @@ public class Asteroid {
 
 		      // Set a random motion for the asteroid.
 
-		      AsteroidGame.asteroids[i].deltaX = Math.random() * AsteroidGame.asteroidsSpeed;
+		      AsteroidGame.asteroids[i].deltaX = Math.random() * asteroidsSpeed;
 		      if (Math.random() < 0.5)
 		    	  AsteroidGame.asteroids[i].deltaX = -AsteroidGame.asteroids[i].deltaX;
-		      AsteroidGame.asteroids[i].deltaY = Math.random() * AsteroidGame.asteroidsSpeed;
+		      AsteroidGame.asteroids[i].deltaY = Math.random() * asteroidsSpeed;
 		      if (Math.random() < 0.5)
 		    	  AsteroidGame.asteroids[i].deltaY = -AsteroidGame.asteroids[i].deltaY;
 
 		      AsteroidGame.asteroids[i].render();
-		      AsteroidGame.asteroidIsSmall[i] = false;
+		      asteroidIsSmall[i] = false;
 		    }
 
-		    AsteroidGame.asteroidsCounter = AsteroidGame.STORM_PAUSE;
-		    AsteroidGame.asteroidsLeft = AsteroidGame.MAX_ROCKS;
-		    if (AsteroidGame.asteroidsSpeed < AsteroidGame.MAX_ROCK_SPEED)
-		    	AsteroidGame.asteroidsSpeed += 0.5;
+		   asteroidsCounter = AsteroidGame.STORM_PAUSE;
+		    asteroidsLeft = AsteroidGame.MAX_ROCKS;
+		    if (asteroidsSpeed < AsteroidGame.MAX_ROCK_SPEED)
+		    	asteroidsSpeed += 0.5;
 		  }
 
 		  public static void initSmallAsteroids(int n) {
@@ -97,12 +106,12 @@ public class Asteroid {
 		        AsteroidGame.asteroids[i].deltaAngle = Math.random() * 2 * AsteroidGame.MAX_ROCK_SPIN - AsteroidGame.MAX_ROCK_SPIN;
 		        AsteroidGame.asteroids[i].x = tempX;
 		        AsteroidGame.asteroids[i].y = tempY;
-		        AsteroidGame.asteroids[i].deltaX = Math.random() * 2 * AsteroidGame.asteroidsSpeed - AsteroidGame.asteroidsSpeed;
-		        AsteroidGame.asteroids[i].deltaY = Math.random() * 2 * AsteroidGame.asteroidsSpeed - AsteroidGame.asteroidsSpeed;
+		        AsteroidGame.asteroids[i].deltaX = Math.random() * 2 * asteroidsSpeed - asteroidsSpeed;
+		        AsteroidGame.asteroids[i].deltaY = Math.random() * 2 * asteroidsSpeed - asteroidsSpeed;
 		        AsteroidGame.asteroids[i].render();
-		        AsteroidGame.asteroidIsSmall[i] = true;
+		        asteroidIsSmall[i] = true;
 		        count++;
-		        AsteroidGame.asteroidsLeft++;
+		        asteroidsLeft++;
 		      }
 		      i++;
 		    } while (i < AsteroidGame.MAX_ROCKS && count < 2);
@@ -124,13 +133,13 @@ public class Asteroid {
 
 		        for (j = 0; j < AsteroidGame.MAX_SHOTS; j++)
 		          if (AsteroidGame.photons[j].active && AsteroidGame.asteroids[i].active && AsteroidGame.asteroids[i].isColliding(AsteroidGame.photons[j])) {
-		        	  AsteroidGame.asteroidsLeft--;
+		        	  asteroidsLeft--;
 		        	  AsteroidGame.asteroids[i].active = false;
 		        	  AsteroidGame.photons[j].active = false;
 		            if (AsteroidGame.sound)
 		              Audio.explosionSound.play();
 		            Explosion.explode(AsteroidGame.asteroids[i]);
-		            if (! AsteroidGame.asteroidIsSmall[i]) {
+		            if (! asteroidIsSmall[i]) {
 		            	AsteroidGame.score += AsteroidGame.BIG_POINTS;
 		              initSmallAsteroids(i);
 		            }
@@ -146,7 +155,7 @@ public class Asteroid {
 		            Audio.crashSound.play();
 		          Explosion.explode(AsteroidGame.ship);
 		          AsteroidGame.ship.stopShip();
-		          UFOclass.stopUfo();
+		          UFO.stopUfo();
 		          AsteroidGame. missile.stopMissle();
 		        }
 		    }
