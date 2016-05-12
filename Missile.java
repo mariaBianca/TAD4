@@ -88,8 +88,18 @@ public class Missile extends SpaceObject{
 			if (dx < 0)
 				angle = Math.PI - angle;
 		}
+
+		// Adjust angle for screen coordinates.
+
+		missile.angle = angle - Math.PI / 2;                              
+		// Change the missile's angle so that it points toward the ship.
+
+		missile.deltaX = 0.75 * AsteroidGame.MAX_ROCK_SPEED * -Math.sin(missile.angle);            
+		missile.deltaY = 0.75 * AsteroidGame.MAX_ROCK_SPEED *  Math.cos(missile.angle);           
+
+
 	}
-	
+
 	public static void stopMissle(Missile missile) {
 
 		missile.active = false;

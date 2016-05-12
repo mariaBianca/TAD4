@@ -131,7 +131,7 @@ public class AsteroidGame extends Applet implements Runnable, KeyListener {
 	boolean paused;
 	static boolean playing;
 	static boolean sound;
-	boolean detail;
+	static boolean detail;
 
 	// Key flags.
 
@@ -158,7 +158,7 @@ public class AsteroidGame extends Applet implements Runnable, KeyListener {
 
 	// Photon data.
 
-	int   photonIndex;    // Index to next available photon sprite.
+	static int   photonIndex;    // Index to next available photon sprite.
 	long  photonTime;     // Time value used to keep firing rate constant.
 
 	// Flying saucer data.
@@ -180,7 +180,7 @@ public class AsteroidGame extends Applet implements Runnable, KeyListener {
 	// Explosion data.
 
 	int[] explosionCounter = new int[MAX_SCRAP];  // Time counters for explosions.
-	int   explosionIndex;                         // Next available explosion sprite.
+	static int   explosionIndex;                         // Next available explosion sprite.
 
 	// Sound clips.
 
@@ -309,11 +309,11 @@ public class AsteroidGame extends Applet implements Runnable, KeyListener {
 		newShipScore = NEW_SHIP_POINTS;
 		newUfoScore = NEW_UFO_POINTS;
 		Ship.initShip(ship,fwdThruster,revThruster );
-		initPhotons();
+		Photon.initPhotons(photons);
 		UFO.stopUfo(ufo);
 		Missile.stopMissle(missile);
 		Asteroid.initAsteroids(asteroids,asteroidIsSmall);
-		initExplosions();
+		Explosion.initExplosions(explosions, explosionCounter);
 		playing = true;
 		paused = false;
 		photonTime = System.currentTimeMillis();
@@ -380,12 +380,12 @@ public class AsteroidGame extends Applet implements Runnable, KeyListener {
 				// Move and process all sprites.
 
 				Ship.updateShip(ship, left, right, down, up, fwdThruster, revThruster);
-				updatePhotons();
+				Photon.updatePhotons(photons);
 				ufo.updateUfo(ufo, photons, ship, missile);
 				Missile.updateMissle(missile, photons, ship, ufo);
 				Asteroid.initAsteroids(asteroids, asteroidIsSmall);
 				Asteroid.updateAsteroids(asteroids, photons, asteroidIsSmall, ship, missile, ufo);
-				updateExplosions();
+				Explosion.updateExplosions(explosions, explosionCounter);
 
 				// Check the score and advance high score, add a new ship or start the
 				// flying saucer as necessary.
@@ -462,108 +462,6 @@ public class AsteroidGame extends Applet implements Runnable, KeyListener {
 			repaint(); Thread.currentThread().sleep(DELAY);
 		}
 		catch (InterruptedException e) {}
-	}
-
-	public void initPhotons() {
-
-		int i;
-
-		for (i = 0; i < MAX_SHOTS; i++)
-			photons[i].active = false;
-		photonIndex = 0;
-	}
-
-	public void updatePhotons() {
-
-		int i;
-
-		// Move any active photons. Stop it when its counter has expired.
-
-		for (i = 0; i < MAX_SHOTS; i++)
-			if (photons[i].active) {
-				if (!photons[i].advance())
-					photons[i].render();
-				else
-					photons[i].active = false;
-			}
-	}
-
-	// Adjust angle for screen coordinates.
-
-	// missile.angle = angle - Math.PI / 2;                               UNCOMMENT HERE
-
-	// Change the missile's angle so that it points toward the ship.
-
-	//missile.deltaX = 0.75 * MAX_ROCK_SPEED * -Math.sin(missile.angle);                UNCOMMENT HERE
-	// missile.deltaY = 0.75 * MAX_ROCK_SPEED *  Math.cos(missile.angle);                UNCOMMENT HERE
-
-
-	public void initExplosions() {
-
-		int i;
-
-		for (i = 0; i < MAX_SCRAP; i++) {
-			explosions[i].shape = new Polygon();
-			explosions[i].active = false;
-			explosionCounter[i] = 0;
-		}
-		explosionIndex = 0;
-	}
-
-	public void explode(SpaceObject s) {
-
-		int c, i, j;
-		int cx, cy;
-
-		// Create sprites for explosion animation. The each individual line segment
-		// of the given sprite is used to create a new sprite that will move
-		// outward  from the sprite's original position with a random rotation.
-
-		s.render();
-		c = 2;
-		if (detail || s.sprite.npoints < 6)
-			c = 1;
-		for (i = 0; i < s.sprite.npoints; i += c) {
-			explosionIndex++;
-			if (explosionIndex >= MAX_SCRAP)
-				explosionIndex = 0;
-			explosions[explosionIndex].active = true;
-			explosions[explosionIndex].shape = new Polygon();
-			j = i + 1;
-			if (j >= s.sprite.npoints)
-				j -= s.sprite.npoints;
-			cx = (int) ((s.shape.xpoints[i] + s.shape.xpoints[j]) / 2);
-			cy = (int) ((s.shape.ypoints[i] + s.shape.ypoints[j]) / 2);
-			explosions[explosionIndex].shape.addPoint(
-					s.shape.xpoints[i] - cx,
-					s.shape.ypoints[i] - cy);
-			explosions[explosionIndex].shape.addPoint(
-					s.shape.xpoints[j] - cx,
-					s.shape.ypoints[j] - cy);
-			explosions[explosionIndex].x = s.x + cx;
-			explosions[explosionIndex].y = s.y + cy;
-			explosions[explosionIndex].angle = s.angle;
-			explosions[explosionIndex].deltaAngle = 4 * (Math.random() * 2 * MAX_ROCK_SPIN - MAX_ROCK_SPIN);
-			explosions[explosionIndex].deltaX = (Math.random() * 2 * MAX_ROCK_SPEED - MAX_ROCK_SPEED + s.deltaX) / 2;
-			explosions[explosionIndex].deltaY = (Math.random() * 2 * MAX_ROCK_SPEED - MAX_ROCK_SPEED + s.deltaY) / 2;
-			explosionCounter[explosionIndex] = SCRAP_COUNT;
-		}
-	}
-
-	public void updateExplosions() {
-
-		int i;
-
-		// Move any active explosion debris. Stop explosion when its counter has
-		// expired.
-
-		for (i = 0; i < MAX_SCRAP; i++)
-			if (explosions[i].active) {
-				explosions[i].advance();
-				explosions[i].render();
-				if (--explosionCounter[i] < 0)
-					explosions[i].active = false;
-			}
 	}
 
 	public void keyPressed(KeyEvent e) {
