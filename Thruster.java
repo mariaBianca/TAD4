@@ -1,5 +1,6 @@
 import java.awt.Polygon;
 
+@SuppressWarnings("unused")
 class Thruster extends SpaceObject {
 	
 	

@@ -1,27 +1,29 @@
 
-public class GameSettings {
+public class GameSettings extends SpaceObject {
 	
-	  public static void initGame() {
+	  @SuppressWarnings("unused")
+	public static void initGame() {
 
 		    // Initialize game data and sprites.
 
-		    int score = 0;
-		    int shipsLeft = Asteroids.MAX_SHIPS;
-		    double asteroidsSpeed = Asteroids.MIN_ROCK_SPEED;
-		    int newShipScore = Asteroids.NEW_SHIP_POINTS;
-		    int newUfoScore = Asteroids.NEW_UFO_POINTS;
+			int score = 0;
+			int shipsLeft = AsteroidGame.MAX_SHIPS;
+		    double AsteroidGameSpeed = AsteroidGame.MIN_ROCK_SPEED;
+		    int newShipScore = AsteroidGame.NEW_SHIP_POINTS;
+		    int newUfoScore = AsteroidGame.NEW_UFO_POINTS;
 		    //initShip();
 		    //initPhotons();
 		    //stopUfo();
 		    //stopMissle();
-		    //initAsteroids();
+		    //initAsteroidGame();
 		    //initExplosions();
 		    boolean playing = true;
 		    boolean paused = false;
 		    long photonTime = System.currentTimeMillis();
 		  }
 
-		  public static void endGame() {
+		  @SuppressWarnings("unused")
+		public static void endGame() {
 
 		    // Stop ship, flying saucer, guided missle and associated sounds.
 

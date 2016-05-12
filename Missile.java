@@ -32,10 +32,10 @@ public class Missile extends SpaceObject{
 		    missile.deltaX = 0.0;
 		    missile.deltaY = 0.0;
 		    missile.render();
-		    Asteroids.missleCounter = Asteroids.MISSLE_COUNT;
-		    if (Asteroids.sound)
-		      Asteroids.missleSound.loop();
-		    Asteroids.misslePlaying = true;
+		    AsteroidGame.missleCounter = AsteroidGame.MISSLE_COUNT;
+		    if (AsteroidGame.sound)
+		      Audio.missleSound.loop();
+		    Audio.misslePlaying = true;
 		  }
 
 
@@ -47,23 +47,23 @@ public class Missile extends SpaceObject{
 	    // it when its counter has expired.
 
 	    if (missile.active) {
-	      if (--Asteroids.missleCounter <= 0)
+	      if (--AsteroidGame.missleCounter <= 0)
 	        stopMissle();
 	      else {
 	        guideMissle();
 	        missile.advance();
 	        missile.render();
-	        for (i = 0; i < Asteroids.MAX_SHOTS; i++)
-	          if (Asteroids.photons[i].active && missile.isColliding(Asteroids.photons[i])) {
-	            if (Asteroids.sound)
-	              Asteroids.crashSound.play();
+	        for (i = 0; i < AsteroidGame.MAX_SHOTS; i++)
+	          if (AsteroidGame.photons[i].active && missile.isColliding(AsteroidGame.photons[i])) {
+	            if (AsteroidGame.sound)
+	              Audio.crashSound.play();
 	            //explode(missile);
 	            stopMissle();
-	            Asteroids.score += Asteroids.MISSLE_POINTS;
+	            AsteroidGame.score += AsteroidGame.MISSLE_POINTS;
 	          }
 	        if (missile.active && ship.active &&
-	            Asteroids.hyperCounter <= 0 && ship.isColliding(missile)) {
-	          if (Asteroids.sound)
+	            AsteroidGame.hyperCounter <= 0 && ship.isColliding(missile)) {
+	          if (AsteroidGame.sound)
 	            //crashSound.play();
 	          //explode(ship);
 	          //stopShip();
@@ -78,7 +78,7 @@ public class Missile extends SpaceObject{
 
 	    double dx, dy, angle;
 
-	    if (!ship.active || Asteroids.hyperCounter > 0)
+	    if (!ship.active || AsteroidGame.hyperCounter > 0)
 	      return;
 
 	    // Find the angle needed to hit the ship.
@@ -107,17 +107,17 @@ public class Missile extends SpaceObject{
 
 	    // Change the missile's angle so that it points toward the ship.
 
-	    missile.deltaX = 0.75 * Asteroids.MAX_ROCK_SPEED * -Math.sin(missile.angle);
-	    missile.deltaY = 0.75 * Asteroids.MAX_ROCK_SPEED *  Math.cos(missile.angle);
+	    missile.deltaX = 0.75 * AsteroidGame.MAX_ROCK_SPEED * -Math.sin(missile.angle);
+	    missile.deltaY = 0.75 * AsteroidGame.MAX_ROCK_SPEED *  Math.cos(missile.angle);
 	  }
 
 	  public void stopMissle() {
 
 	    missile.active = false;
-	    Asteroids.missleCounter = 0;
-	    if (Asteroids.loaded)
+	    AsteroidGame.missleCounter = 0;
+	    if (AsteroidGame.loaded)
 	      //missleSound.stop();
-	    Asteroids.misslePlaying = false;
+	    Audio.misslePlaying = false;
 	  }
 
 }
