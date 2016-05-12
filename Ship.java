@@ -40,57 +40,57 @@ public class Ship extends SpaceObject{
 	    revThruster.angle = ship.angle;
 	    revThruster.render();
 
-	    if (Asteroids.loaded)
+	    if (AsteroidGame.loaded)
 	      //thrustersSound.stop();
-	    Asteroids.thrustersPlaying = false;
-	    Asteroids.hyperCounter = 0;
+	    Audio.thrustersPlaying = false;
+	    AsteroidGame.hyperCounter = 0;
 	  }
 
 	  public void updateShip() {
 
 	    double dx, dy, speed;
 
-	    if (!Asteroids.playing)
+	    if (!AsteroidGame.playing)
 	      return;
 
 	    // Rotate the ship if left or right cursor key is down.
 
-	    if (Asteroids.left) {
-	      ship.angle += Asteroids.SHIP_ANGLE_STEP;
+	    if (AsteroidGame.left) {
+	      ship.angle += AsteroidGame.SHIP_ANGLE_STEP;
 	      if (ship.angle > 2 * Math.PI)
 	        ship.angle -= 2 * Math.PI;
 	    }
-	    if (Asteroids.right) {
-	      ship.angle -= Asteroids.SHIP_ANGLE_STEP;
+	    if (AsteroidGame.right) {
+	      ship.angle -= AsteroidGame.SHIP_ANGLE_STEP;
 	      if (ship.angle < 0)
 	        ship.angle += 2 * Math.PI;
 	    }
 
 	    // Fire thrusters if up or down cursor key is down.
 
-	    dx = Asteroids.SHIP_SPEED_STEP * -Math.sin(ship.angle);
-	    dy = Asteroids.SHIP_SPEED_STEP *  Math.cos(ship.angle);
-	    if (Asteroids.up) {
+	    dx = AsteroidGame.SHIP_SPEED_STEP * -Math.sin(ship.angle);
+	    dy = AsteroidGame.SHIP_SPEED_STEP *  Math.cos(ship.angle);
+	    if (AsteroidGame.up) {
 	      ship.deltaX += dx;
 	      ship.deltaY += dy;
 	    }
-	    if (Asteroids.down) {
+	    if (AsteroidGame.down) {
 	        ship.deltaX -= dx;
 	        ship.deltaY -= dy;
 	    }
 
 	    // Don't let ship go past the speed limit.
 
-	    if (Asteroids.up || Asteroids.down) {
+	    if (AsteroidGame.up || AsteroidGame.down) {
 	      speed = Math.sqrt(ship.deltaX * ship.deltaX + ship.deltaY * ship.deltaY);
-	      if (speed > Asteroids.MAX_SHIP_SPEED) {
-	        dx = Asteroids.MAX_SHIP_SPEED * -Math.sin(ship.angle);
-	        dy = Asteroids.MAX_SHIP_SPEED *  Math.cos(ship.angle);
-	        if (Asteroids.up)
+	      if (speed > AsteroidGame.MAX_SHIP_SPEED) {
+	        dx = AsteroidGame.MAX_SHIP_SPEED * -Math.sin(ship.angle);
+	        dy = AsteroidGame.MAX_SHIP_SPEED *  Math.cos(ship.angle);
+	        if (AsteroidGame.up)
 	          ship.deltaX = dx;
 	        else
 	          ship.deltaX = -dx;
-	        if (Asteroids.up)
+	        if (AsteroidGame.up)
 	          ship.deltaY = dy;
 	        else
 	          ship.deltaY = -dy;
@@ -102,8 +102,8 @@ public class Ship extends SpaceObject{
 	    if (ship.active) {
 	      ship.advance();
 	      ship.render();
-	      if (Asteroids.hyperCounter > 0)
-	        Asteroids.hyperCounter--;
+	      if (AsteroidGame.hyperCounter > 0)
+	        AsteroidGame.hyperCounter--;
 
 	      // Update the thruster sprites to match the ship sObj.
 
@@ -123,10 +123,10 @@ public class Ship extends SpaceObject{
 	    // danger.) If that was the last ship, end the game.
 
 	    else
-	      if (-- Asteroids.shipCounter <= 0)
-	        if (Asteroids.shipsLeft > 0) {
+	      if (-- AsteroidGame.shipCounter <= 0)
+	        if (AsteroidGame.shipsLeft > 0) {
 	          initShip();
-	          Asteroids.hyperCounter = Asteroids.HYPER_COUNT;
+	          AsteroidGame.hyperCounter = AsteroidGame.HYPER_COUNT;
 	        }
 	        else
 	          GameSettings.endGame();
@@ -135,12 +135,12 @@ public class Ship extends SpaceObject{
 	  public void stopShip() {
 
 	    ship.active = false;
-	    Asteroids.shipCounter = Asteroids.SCRAP_COUNT;
-	    if (Asteroids.shipsLeft > 0)
-	      Asteroids.shipsLeft--;
-	    if (Asteroids.loaded)
+	    AsteroidGame.shipCounter = AsteroidGame.SCRAP_COUNT;
+	    if (AsteroidGame.shipsLeft > 0)
+	      AsteroidGame.shipsLeft--;
+	    if (AsteroidGame.loaded)
 	      //thrustersSound.stop();
-	    Asteroids.thrustersPlaying = false;
+	    Audio.thrustersPlaying = false;
 	  }
 
 }
