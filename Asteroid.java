@@ -131,7 +131,7 @@ public class Asteroid extends SpaceObject{
 						photons[j].active = false;
 						if (AsteroidGame.sound)
 							AsteroidGame.explosionSound.play();
-						//explode(asteroids[i]);                                     UNCOMMENT HERE
+						Explosion.explode(asteroids[i]);                    
 						if (!asteroidisSmall[i]) {
 							AsteroidGame.score += AsteroidGame.BIG_POINTS;
 							Asteroid.initSmallAsteroids(i, asteroids, asteroidisSmall);
@@ -146,7 +146,7 @@ public class Asteroid extends SpaceObject{
 						asteroids[i].active && asteroids[i].isColliding(ship)) {
 					if (AsteroidGame.sound)
 						AsteroidGame.crashSound.play();
-					//explode(ship);                                             UNCOMMENT HERE                                    
+					Explosion.explode(ship);                                                                        
 					Ship.stopShip(ship);
 					UFO.stopUfo(ufo);
 					Missile.stopMissle(missile);

@@ -148,7 +148,7 @@ public class AsteroidGame extends Applet implements Runnable, KeyListener {
 	Missile   missile;
 	Photon[] photons    = new Photon[MAX_SHOTS];
 	Asteroid[] asteroids  = new Asteroid[MAX_ROCKS];
-	Explosion[] explosions = new Explosion[MAX_SCRAP];
+	static Explosion[] explosions = new Explosion[MAX_SCRAP];
 
 	// Ship data.
 
@@ -179,7 +179,7 @@ public class AsteroidGame extends Applet implements Runnable, KeyListener {
 
 	// Explosion data.
 
-	int[] explosionCounter = new int[MAX_SCRAP];  // Time counters for explosions.
+	static int[] explosionCounter = new int[MAX_SCRAP];  // Time counters for explosions.
 	static int   explosionIndex;                         // Next available explosion sprite.
 
 	// Sound clips.
@@ -463,6 +463,58 @@ public class AsteroidGame extends Applet implements Runnable, KeyListener {
 		}
 		catch (InterruptedException e) {}
 	}
+
+
+	// Adjust angle for screen coordinates.
+
+	// missile.angle = angle - Math.PI / 2;                               UNCOMMENT HERE
+
+	// Change the missile's angle so that it points toward the ship.
+
+	//missile.deltaX = 0.75 * MAX_ROCK_SPEED * -Math.sin(missile.angle);                UNCOMMENT HERE
+	// missile.deltaY = 0.75 * MAX_ROCK_SPEED *  Math.cos(missile.angle);                UNCOMMENT HERE
+
+
+	public void explode(SpaceObject s) {
+
+		int c, i, j;
+		int cx, cy;
+
+		// Create sprites for explosion animation. The each individual line segment
+		// of the given sprite is used to create a new sprite that will move
+		// outward  from the sprite's original position with a random rotation.
+
+		s.render();
+		c = 2;
+		if (detail || s.sprite.npoints < 6)
+			c = 1;
+		for (i = 0; i < s.sprite.npoints; i += c) {
+			explosionIndex++;
+			if (explosionIndex >= MAX_SCRAP)
+				explosionIndex = 0;
+			explosions[explosionIndex].active = true;
+			explosions[explosionIndex].shape = new Polygon();
+			j = i + 1;
+			if (j >= s.sprite.npoints)
+				j -= s.sprite.npoints;
+			cx = (int) ((s.shape.xpoints[i] + s.shape.xpoints[j]) / 2);
+			cy = (int) ((s.shape.ypoints[i] + s.shape.ypoints[j]) / 2);
+			explosions[explosionIndex].shape.addPoint(
+					s.shape.xpoints[i] - cx,
+					s.shape.ypoints[i] - cy);
+			explosions[explosionIndex].shape.addPoint(
+					s.shape.xpoints[j] - cx,
+					s.shape.ypoints[j] - cy);
+			explosions[explosionIndex].x = s.x + cx;
+			explosions[explosionIndex].y = s.y + cy;
+			explosions[explosionIndex].angle = s.angle;
+			explosions[explosionIndex].deltaAngle = 4 * (Math.random() * 2 * MAX_ROCK_SPIN - MAX_ROCK_SPIN);
+			explosions[explosionIndex].deltaX = (Math.random() * 2 * MAX_ROCK_SPEED - MAX_ROCK_SPEED + s.deltaX) / 2;
+			explosions[explosionIndex].deltaY = (Math.random() * 2 * MAX_ROCK_SPEED - MAX_ROCK_SPEED + s.deltaY) / 2;
+			explosionCounter[explosionIndex] = SCRAP_COUNT;
+		}
+	}
+
 
 	public void keyPressed(KeyEvent e) {
 

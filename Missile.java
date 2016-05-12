@@ -37,32 +37,32 @@ public class Missile extends SpaceObject{
 
 		if (missile.active) {
 			if (--AsteroidGame.missleCounter <= 0)
-				;  //stopMissle();                             UNCOMMENT HERE
+				stopMissle(missile);                          
 			else {
-				//guideMissle();                             UNCOMMENT HERE
+				guideMissle(ship, missile);                            
 				missile.advance();
 				missile.render();
 				for (i = 0; i < AsteroidGame.MAX_SHOTS; i++)
 					if (photons[i].active && missile.isColliding(photons[i])) {
 						if (AsteroidGame.sound)
 							AsteroidGame.crashSound.play();
-						//explode(missile);                             UNCOMMENT HERE
-						//stopMissle();                             UNCOMMENT HERE
+						Explosion.explode(missile);    
+						stopMissle(missile);      
 						AsteroidGame.score += AsteroidGame.MISSLE_POINTS;
 					}
 				if (missile.active && ship.active &&
 						AsteroidGame.hyperCounter <= 0 && ship.isColliding(missile)) {
 					if (AsteroidGame.sound)
 						AsteroidGame.crashSound.play();
-					//explode(ship);                UNCOMMENT HERE
+					Explosion.explode(ship);
 					Ship.stopShip(ship);
 					UFO.stopUfo(ufo);
-					//stopMissle();
+					stopMissle(missile);
 				}
 			}
 		}
 	}
-	public void guideMissle(Ship ship, Missile missile) {
+	public static void guideMissle(Ship ship, Missile missile) {
 
 		double dx, dy, angle;
 

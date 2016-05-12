@@ -32,7 +32,7 @@ public class Explosion extends SpaceObject{
 	}
 	
 
-	public void explode(SpaceObject s, Explosion[] explosions, int[] explosionCounter) {
+	public static void explode(SpaceObject s) {
 
 		int c, i, j;
 		int cx, cy;
@@ -49,26 +49,26 @@ public class Explosion extends SpaceObject{
 			AsteroidGame.explosionIndex++;
 			if (AsteroidGame.explosionIndex >= AsteroidGame.MAX_SCRAP)
 				AsteroidGame.explosionIndex = 0;
-			explosions[AsteroidGame.explosionIndex].active = true;
-			explosions[AsteroidGame.explosionIndex].shape = new Polygon();
+			AsteroidGame.explosions[AsteroidGame.explosionIndex].active = true;
+			AsteroidGame.explosions[AsteroidGame.explosionIndex].shape = new Polygon();
 			j = i + 1;
 			if (j >= s.sprite.npoints)
 				j -= s.sprite.npoints;
 			cx = (int) ((s.shape.xpoints[i] + s.shape.xpoints[j]) / 2);
 			cy = (int) ((s.shape.ypoints[i] + s.shape.ypoints[j]) / 2);
-			explosions[AsteroidGame.explosionIndex].shape.addPoint(
+			AsteroidGame.explosions[AsteroidGame.explosionIndex].shape.addPoint(
 					s.shape.xpoints[i] - cx,
 					s.shape.ypoints[i] - cy);
-			explosions[AsteroidGame.explosionIndex].shape.addPoint(
+			AsteroidGame.explosions[AsteroidGame.explosionIndex].shape.addPoint(
 					s.shape.xpoints[j] - cx,
 					s.shape.ypoints[j] - cy);
-			explosions[AsteroidGame.explosionIndex].x = s.x + cx;
-			explosions[AsteroidGame.explosionIndex].y = s.y + cy;
-			explosions[AsteroidGame.explosionIndex].angle = s.angle;
-			explosions[AsteroidGame.explosionIndex].deltaAngle = 4 * (Math.random() * 2 * AsteroidGame.MAX_ROCK_SPIN - AsteroidGame.MAX_ROCK_SPIN);
-			explosions[AsteroidGame.explosionIndex].deltaX = (Math.random() * 2 * AsteroidGame.MAX_ROCK_SPEED - AsteroidGame.MAX_ROCK_SPEED + s.deltaX) / 2;
-			explosions[AsteroidGame.explosionIndex].deltaY = (Math.random() * 2 * AsteroidGame.MAX_ROCK_SPEED - AsteroidGame.MAX_ROCK_SPEED + s.deltaY) / 2;
-			explosionCounter[AsteroidGame.explosionIndex] = AsteroidGame.SCRAP_COUNT;
+			AsteroidGame.explosions[AsteroidGame.explosionIndex].x = s.x + cx;
+			AsteroidGame.explosions[AsteroidGame.explosionIndex].y = s.y + cy;
+			AsteroidGame.explosions[AsteroidGame.explosionIndex].angle = s.angle;
+			AsteroidGame.explosions[AsteroidGame.explosionIndex].deltaAngle = 4 * (Math.random() * 2 * AsteroidGame.MAX_ROCK_SPIN - AsteroidGame.MAX_ROCK_SPIN);
+			AsteroidGame.explosions[AsteroidGame.explosionIndex].deltaX = (Math.random() * 2 * AsteroidGame.MAX_ROCK_SPEED - AsteroidGame.MAX_ROCK_SPEED + s.deltaX) / 2;
+			AsteroidGame.explosions[AsteroidGame.explosionIndex].deltaY = (Math.random() * 2 * AsteroidGame.MAX_ROCK_SPEED - AsteroidGame.MAX_ROCK_SPEED + s.deltaY) / 2;
+			AsteroidGame.explosionCounter[AsteroidGame.explosionIndex] = AsteroidGame.SCRAP_COUNT;
 		}
 	}
 
